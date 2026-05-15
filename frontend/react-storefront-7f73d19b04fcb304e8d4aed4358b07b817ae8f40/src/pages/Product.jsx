@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
-const PRODUCTS_API_URL = "https://69933cce8f29113acd406d64.mockapi.io/products"
+const PRODUCTS_API_URL = "http://localhost:5050/products"
 
 function Product() {
   const { id } = useParams()

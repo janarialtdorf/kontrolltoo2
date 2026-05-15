@@ -11,23 +11,24 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [sort, setSort] = useState("id,asc")
+  const [page, setPage] = useState(0)
   const [size, setSize] = useState(2)
-  const CATEGORIES_API_URL = "https://69933cce8f29113acd406d64.mockapi.io/categories"
+  const CATEGORIES_API_URL = "http://localhost:5050/categories"
 
   useEffect(() => {
-      fetch(CATEGORIES_API_URL)
-        .then((response) => response.json())
-        .then((json) => setCategories(json))
-    }, [])
+    fetch(CATEGORIES_API_URL)
+      .then((response) => response.json())
+      .then((json) => setCategories(json))
+  }, [])
 
   useEffect(() => {
-     fetch("https://69933cce8f29113acd406d64.mockapi.io/products")
+    fetch(`http://localhost:5050/products?page=${page}&size=${size}&sort=${sort}`)
       .then(res => res.json())
       .then(json => {
-        setAllProducts(json)
-        setProducts(json)
+        setAllProducts(json.content || [])
+        setProducts(json.content || [])
       })
-  }, [selectedCategory, sort, size]);
+  }, [selectedCategory, sort, size, page])
 
   const sortAZ = () => {
     setSort("name,asc")
@@ -38,7 +39,7 @@ function Home() {
   }
 
   const sortPriceIncreasing = () => {
-     setSort("price,asc")
+    setSort("price,asc")
   }
 
   const sortPriceDecreasing = () => {
@@ -69,7 +70,7 @@ function Home() {
       <div className="flex items-center gap-2">
         <label htmlFor="category-filter">Choose category</label>
         <select onChange={(e) => filterByCategory(e.target.value)}>
-          {categories.map(category => 
+          {categories.map(category =>
             <option>{category.name}</option>
           )}
         </select>
@@ -82,16 +83,20 @@ function Home() {
           <option>3</option>
         </select>
       </div>
-
+      <div>
+        <button onClick={() => setPage(page - 1)}>Eelmine</button>
+        {page + 1}
+        <button onClick={() => setPage(page + 1)}>Järgmine</button>
+      </div>
 
       <div>{products.length} items currently in stock.</div>
-      {products.map((product, index) => 
+      {products.map((product, index) =>
         <div key={product.id} className="grid w-full grid-cols-[2rem_100px_minmax(0,1fr)_auto] items-center gap-4 py-8">
           <div className="text-right">{index + 1}.</div>
           <img className="w-[100px] h-[100px] object-cover" src={product.image} alt={product.description} />
           <div className="min-w-0">
-            <div>{product.title}</div> 
-            <div>{product.price}€</div> 
+            <div>{product.title}</div>
+            <div>{product.price}€</div>
           </div>
           <div className="justify-self-end flex gap-2">
             <Button asChild variant="outline">
@@ -105,7 +110,7 @@ function Home() {
                 toast("Product has been added to the cart.", {
                   icon: <Check className="h-4 w-4" />,
                 })
-              }} 
+              }}
             >
               <ShoppingBag />
             </Button>
